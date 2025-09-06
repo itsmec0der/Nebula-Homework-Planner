@@ -24,7 +24,9 @@ const App: React.FC = () => {
   
   const isGuest = activeUserKey === 'GUEST_MODE';
   
-  const [theme, setTheme] = useLocalStorage<Theme>(`nebula-theme-${activeUserKey}`, THEMES[0], !isGuest);
+  const [themeMode, setThemeMode] = useLocalStorage<'light' | 'dark'>(`nebula-theme-mode-${activeUserKey}`, 'dark', !isGuest);
+  const theme = useMemo(() => THEMES.find(t => t.type === themeMode) || THEMES.find(t => t.type === 'dark')!, [themeMode]);
+
   const [classes, setClasses] = useLocalStorage<Class[]>(`nebula-classes-${activeUserKey}`, [], !isGuest);
   const [homework, setHomework] = useLocalStorage<Homework[]>(`nebula-homework-${activeUserKey}`, [], !isGuest);
   const [studySessions, setStudySessions] = useLocalStorage<StudySession[]>(`nebula-study-sessions-${activeUserKey}`, [], !isGuest);
@@ -60,7 +62,7 @@ const App: React.FC = () => {
     setActiveView('dashboard');
     if (isGuest) {
       // Reset all state to initial values for a clean guest session
-      setTheme(THEMES[0]);
+      setThemeMode('dark');
       setClasses([]);
       setHomework([]);
       setStudySessions([]);
@@ -68,7 +70,7 @@ const App: React.FC = () => {
       setScheduleOverrides({});
       setProfile({ name: 'Guest', school: 'Guest Mode', grade: '', avatar: '' });
     }
-  }, [activeUserKey, isGuest, setClasses, setHomework, setProfile, setScheduleOverrides, setScheduleSettings, setStudySessions, setTheme]);
+  }, [activeUserKey, isGuest, setClasses, setHomework, setProfile, setScheduleOverrides, setScheduleSettings, setStudySessions, setThemeMode]);
 
   const getDayType = useCallback((date: Date): 'a' | 'b' | 'none' => {
     if (!scheduleSettings) return 'none';
@@ -327,8 +329,8 @@ const App: React.FC = () => {
         return <ClassManager classes={classes} setClasses={setClasses} requestConfirmation={requestConfirmation} />;
       case 'settings':
         return <ThemeSwitcher 
-                  currentTheme={theme} 
-                  onThemeChange={setTheme} 
+                  themeMode={themeMode} 
+                  onThemeModeChange={setThemeMode} 
                   scheduleSettings={scheduleSettings} 
                   onScheduleSettingsChange={setScheduleSettings}
                   profile={profile}

@@ -27,6 +27,7 @@ export interface Class {
 export interface Theme {
   name: string;
   className: string;
+  type: 'light' | 'dark';
   cssVars: {
     '--theme-primary': string;
     '--theme-secondary': string;

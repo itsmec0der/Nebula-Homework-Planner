@@ -1,13 +1,13 @@
 
 
 import React, { useRef } from 'react';
-import { Camera, LogOut, LogIn } from 'lucide-react';
+import { Camera, LogOut, LogIn, Sun, Moon } from 'lucide-react';
 import type { Theme, ScheduleSettings, UserProfile } from '../types';
 import { THEMES } from '../constants';
 
 interface SettingsViewProps {
-  currentTheme: Theme;
-  onThemeChange: (theme: Theme) => void;
+  themeMode: 'light' | 'dark';
+  onThemeModeChange: (mode: 'light' | 'dark') => void;
   scheduleSettings: ScheduleSettings | null;
   onScheduleSettingsChange: (settings: ScheduleSettings | null) => void;
   profile: UserProfile;
@@ -16,7 +16,7 @@ interface SettingsViewProps {
   isGuest: boolean;
 }
 
-const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThemeChange, scheduleSettings, onScheduleSettingsChange, profile, onProfileChange, onLogout, isGuest }) => {
+const SettingsView: React.FC<SettingsViewProps> = ({ themeMode, onThemeModeChange, scheduleSettings, onScheduleSettingsChange, profile, onProfileChange, onLogout, isGuest }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,23 +125,26 @@ const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThemeChange
 
         <div className="bg-theme-glass border border-theme-border rounded-2xl p-6 shadow-lg">
           <h2 className="text-xl font-semibold text-theme-text-primary mb-4">Appearance</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {THEMES.map(theme => (
-              <div 
-                key={theme.name} 
-                onClick={() => onThemeChange(theme)}
-                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 transform ${currentTheme.name === theme.name ? 'border-theme-primary scale-105 shadow-xl' : 'border-theme-border hover:border-theme-secondary hover:scale-[1.02]'}`}
+          <div className="flex items-center justify-between rounded-lg p-4 bg-black/10">
+            <span className="font-semibold text-theme-text-primary">Color Mode</span>
+            <div className="flex items-center gap-4">
+              <Sun size={20} className={`transition-colors ${themeMode === 'light' ? 'text-theme-primary' : 'text-theme-text-secondary'}`} />
+              <button
+                type="button"
+                role="switch"
+                aria-checked={themeMode === 'dark'}
+                onClick={() => onThemeModeChange(themeMode === 'light' ? 'dark' : 'light')}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-theme-primary focus:ring-offset-2 focus:ring-offset-theme-glass ${themeMode === 'dark' ? 'bg-theme-primary' : 'bg-black/30'}`}
               >
-                <div className="h-24 rounded-md mb-4" style={{ background: theme.cssVars['--theme-bg'] }}>
-                  <div className="flex items-center justify-center h-full gap-2 p-2">
-                    <div className="w-4 h-12 rounded" style={{backgroundColor: theme.cssVars['--theme-primary']}}></div>
-                    <div className="w-4 h-16 rounded" style={{backgroundColor: theme.cssVars['--theme-secondary']}}></div>
-                    <div className="w-4 h-8 rounded" style={{backgroundColor: theme.cssVars['--theme-accent']}}></div>
-                  </div>
-                </div>
-                <h3 className="font-semibold text-center text-theme-text-primary">{theme.name}</h3>
-              </div>
-            ))}
+                <span
+                  aria-hidden="true"
+                  className={`${
+                    themeMode === 'dark' ? 'translate-x-5' : 'translate-x-0'
+                  } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                />
+              </button>
+              <Moon size={20} className={`transition-colors ${themeMode === 'dark' ? 'text-theme-primary' : 'text-theme-text-secondary'}`} />
+            </div>
           </div>
         </div>
 
